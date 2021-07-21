@@ -1,0 +1,58 @@
+{% load static %}
+{% load socialaccount %}
+{% providers_media_js %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>커뮤니티</title>
+</head>
+<body>
+
+    {% if user.is_authenticated %}
+        <a href="/accounts/logout">로그아웃</a><br>
+        {{user.username}}님이 로그인 중<br>
+    {% else %}
+        <a href="/accounts/signup">회원가입</a><br>
+        <a href="{% provider_login_url 'google' %}">구글 로그인</a><br>
+        <a href="{% provider_login_url 'naver' %}">네이버 로그인</a><br>
+        <a href="{% provider_login_url 'kakao' %}">카카오 로그인</a><br>
+    {% endif %}
+
+    <img src="{% static 'orange.jpg' %}" alt="오렌지" width="150px"><br>
+    
+    <form action="{% url 'search' %}"method="POST">
+        {% csrf_token %}
+        <input type="text" name="q"> 
+        <button type="submit">검색</button>
+    </form>
+    <br>
+    
+    {% if results %}
+    <br>검색 결과<br>
+        {% for result in results.all %}
+            제목: {{ result.title }}<br>
+            작성자: {{ result.author }}<br>
+            날짜: {{ result.pub_date }}<br>
+            사진: <img src="{{ result.image.url }}" width="100px" alt="엑박"><br>
+            본문: {{ result.summary }} <a href="{% url 'detail' result.id %}">...more</a><br><br>
+        {% endfor %}
+    {% else %}
+        {% if data %}
+            검색어를 입력해주세요<br>
+        {% endif %}
+        <br>글 목록<br>
+        {% for post in posts %}
+            제목: {{ post.title }}<br>
+            작성자: {{ post.author }}<br>
+            날짜: {{ post.pub_date }}<br>
+            사진: <img src="{{ post.image.url }}" width="100px" alt="엑박"><br>
+            본문: {{ post.summary }} <a href="{% url 'detail' post.id %}">...more</a><br><br>
+        {% endfor %}
+    {% endif %}
+
+</body>
+</html>
